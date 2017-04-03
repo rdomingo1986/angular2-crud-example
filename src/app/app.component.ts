@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  public counter: number;
+  public last_id: number;
   public id: number;
   public first_name: string;
   public last_name: string;
@@ -17,14 +17,22 @@ export class AppComponent {
   constructor() { 
     this.operation = 'register';
     this.persons = [];
-    this.id = this.counter = 0;
+    let persons_array: Array<any> = JSON.parse(localStorage.getItem('persons_array'));
+    this.persons = (persons_array === null || persons_array.length === 0) ? [] : persons_array; 
+    this.id = 0;
+    if(this.persons.length === 0){
+      this.last_id = 0;
+    }else{
+      this.last_id = this.persons[this.persons.length-1].id;
+    }
+    console.log(this.last_id);
   }
 
   public registerAuthor() {
     if(this.operation === 'register'){
-      this.counter++;
+      this.last_id++;
       this.persons.push({
-        id: this.counter,
+        id: this.last_id,
         first_name: this.first_name,
         last_name: this.last_name,
         bio: this.bio
@@ -44,6 +52,7 @@ export class AppComponent {
       }
       this.operation = 'register';
     }
+    localStorage.setItem('persons_array',JSON.stringify(this.persons));
     this.cleanProperties();
   }
 
@@ -66,6 +75,12 @@ export class AppComponent {
     this.persons.splice(index,1);
     this.cleanProperties();
     this.operation = 'register';
+    if(! (this.persons.length === 0)) {
+      localStorage.setItem('persons_array',JSON.stringify(this.persons));
+    }else{
+      localStorage.clear();
+    }
+    
   }
 
   private cleanProperties() {
